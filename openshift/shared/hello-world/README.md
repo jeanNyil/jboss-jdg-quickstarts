@@ -39,7 +39,7 @@ Running the Hello World Quickstart
 1. Invoke cache operations with the quickstart application.
 ```bash
 $ oc run hello-world \
---image=`oc get is quickstart -o jsonpath="{.status.dockerImageRepository}"` \
+--image=`oc get is hello-world -o jsonpath="{.status.dockerImageRepository}"` \
 --replicas=1 \
 --restart=OnFailure \
 --env APP_NAME=${appName} \
@@ -55,7 +55,7 @@ $ oc run hello-world \
 
 2. Verify the cache operations completed successfully.
 ```
-$ oc logs quickstart-${id} --tail=50
+$ oc logs hello-world-${id} --tail=50
 --- Connect to datagrid-service ---
 ...
 --- Store key='hello'/value='world' pair ---
