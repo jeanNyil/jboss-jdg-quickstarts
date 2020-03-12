@@ -18,53 +18,40 @@ Configuring Authentication
 --------------------------
 The quickstart application must authenticate with Data Grid services.
 
-1. Open `HelloWorld.java` for editing.
-
-2. In the `HelloWorld` class, update the following values with the credentials you specified when you created the Data Grid service:
-```java
-private static final String USER = "test";
-private static final String PASSWORD = "changeme";
-```
-
-3. Save and close `HelloWorld.java`.
-
 Building the Hello World Quickstart
 -----------------------------------
 
-1. Create a new binary build on OpenShift.
+1. Create a new source build on OpenShift.
 ```bash
-$ oc new-build \
-    --binary \
-    --strategy=source \
-    --name=quickstart \
-    -l app=quickstart \
-    fabric8/s2i-java:2.3
+$ oc new-build fabric8/s2i-java:2.3~https://github.com/jeanNyil/jboss-jdg-quickstarts.git#test-dg-7.3 \
+--name=hello-world \
+--strategy=source \
+--context-dir="/openshift/shared/hello-world"
 ```
 
-2. Build the Hello World quickstart.
+2. Follow the build on Openshift
 ```bash
-$ mvn -s ../../../settings.xml clean package compile -DincludeScope=runtime
-```
-  Artifacts are built in the `target` directory.
-
-3. Start the build on OpenShift.
-```bash
-$ oc start-build quickstart --from-dir=target/ --follow
+oc logs bc/hello-world
 ```
 
 Running the Hello World Quickstart
 ----------------------------------
 1. Invoke cache operations with the quickstart application.
 ```bash
-$ oc run quickstart \
-    --image=`oc get is quickstart -o jsonpath="{.status.dockerImageRepository}"` \
-    --replicas=1 \
-    --restart=OnFailure \
-    --env APP_NAME=${appName} \
-    --env SVC_DNS_NAME=${appName} \
-    --env JAVA_OPTIONS=-ea
+$ oc run hello-world \
+--image=`oc get is quickstart -o jsonpath="{.status.dockerImageRepository}"` \
+--replicas=1 \
+--restart=OnFailure \
+--env APP_NAME=${appName} \
+--env SVC_DNS_NAME=${appName} \
+--env JAVA_OPTIONS=-ea \
+--env DG_USERNAME=${datagrid_username} \
+--env DG_PASSWORD=${datagrid_password}
 ```
-  Where `${appName}` matches the application name that you specified when you created `cache-service` or `datagrid-service`.
+  Where:
+  -  `${appName}` matches the application name that you specified when you created `cache-service` or `datagrid-service`.
+  - `${datagrid_username}` is the username to connect to the datagrid service
+  - `${datagrid_username}` is the password to connect to the datagrid service
 
 2. Verify the cache operations completed successfully.
 ```
@@ -87,9 +74,8 @@ $ oc logs quickstart-${id} --tail=50
   - Delete quickstart resources and continue using the project with RHDG for OpenShift.
 
     ```bash
-    $ oc delete all --selector=run=quickstart || true
-    $ oc delete imagestream quickstart || true
-    $ oc delete buildconfig quickstart || true
+    $ oc delete all -lrun=hello-world || true
+    $ oc delete all -lbuild=hello-world || true
     ```
 
   - Delete the project to remove all resources, for example:
