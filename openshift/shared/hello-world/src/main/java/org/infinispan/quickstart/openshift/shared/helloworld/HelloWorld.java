@@ -8,8 +8,8 @@ public class HelloWorld {
 
    private static final String APP_NAME = System.getenv("APP_NAME");
    private static final String SVC_DNS_NAME = System.getenv("SVC_DNS_NAME");
-   private static final String USER = "dg-user";
-   private static final String PASSWORD = "P@ssw0rd";
+   private static final String USER = System.getenv("DG_USERNAME");
+   private static final String PASSWORD = System.getenv("DG_PASSWORD");
 
    private static final String KEY = "hello";
    private static final String VALUE = "world";
